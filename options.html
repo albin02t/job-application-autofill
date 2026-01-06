@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Job Autofill Options</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background-color: #f4f7f6;
+    }
+    #sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      border-right: 1px solid #34495e;
+    }
+    #sidebar h2 {
+      padding: 20px;
+      margin: 0;
+      font-size: 18px;
+      background-color: #34495e;
+    }
+    #profileList {
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .profile-item {
+      padding: 15px 20px;
+      cursor: pointer;
+      border-bottom: 1px solid #34495e;
+      transition: background 0.2s;
+    }
+    .profile-item:hover, .profile-item.active {
+      background-color: #3498db;
+    }
+    #addProfileBtn {
+      padding: 15px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+    #addProfileBtn:hover {
+      background-color: #2ecc71;
+    }
+    #main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    h1 { margin-top: 0; color: #2c3e50; }
+    .form-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: 500; color: #555; }
+    input[type="text"], input[type="email"], input[type="tel"], input[type="url"], textarea {
+      width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-size: 14px;
+    }
+    textarea { height: 120px; resize: vertical; }
+    .actions { margin-top: 20px; text-align: right; }
+    button.save { background-color: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button.delete { background-color: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-right: 10px; }
+    .status { margin-top: 10px; text-align: center; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div id="sidebar">
+    <h2>Profiles</h2>
+    <ul id="profileList">
+      <!-- Profiles injected here -->
+    </ul>
+    <button id="addProfileBtn">+ New Profile</button>
+  </div>
+  <div id="main">
+    <div class="container" id="editorContainer" style="display:none;">
+      <h1 id="editorTitle">Edit Profile</h1>
+      
+      <div class="form-group">
+        <label for="profileName">Profile Name (e.g. Frontend Dev)</label>
+        <input type="text" id="profileName" placeholder="My Profile">
+      </div>
+      
+      <hr>
+
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName">
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email">
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone">
+      </div>
+      <div class="form-group">
+        <label for="linkedin">LinkedIn URL</label>
+        <input type="url" id="linkedin">
+      </div>
+      <div class="form-group">
+        <label for="portfolio">Portfolio URL</label>
+        <input type="url" id="portfolio">
+      </div>
+
+      <div class="form-group">
+        <label for="resumeFile">Upload Resume (PDF)</label>
+        <input type="file" id="resumeFile" accept=".pdf">
+      </div>
+
+      <div class="form-group">
+        <label for="resumeText">Resume Context</label>
+        <textarea id="resumeText"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="coverLetter">Cover Letter Template</label>
+        <textarea id="coverLetter"></textarea>
+      </div>
+
+      <div class="actions">
+        <button id="deleteBtn" class="delete">Delete Profile</button>
+        <button id="saveBtn" class="save">Save Changes</button>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+    
+    <div id="welcome" class="container">
+      <h1>Welcome to Job Autofill</h1>
+      <p>Select a profile from the sidebar to edit, or create a new one.</p>
+    </div>
+  </div>
+  <script type="module" src="options.js"></script>
+</body>
+</html>

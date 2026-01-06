@@ -1,96 +1,73 @@
-import * as pdfjsLib from './lib/pdf.js';
-
-// Configure PDF.js worker
-pdfjsLib.GlobalWorkerOptions.workerSrc = './lib/pdf.worker.js';
-
 document.addEventListener('DOMContentLoaded', async () => {
-    const saveBtn = document.getElementById('saveBtn');
+    const profileSelect = document.getElementById('profileSelect');
     const autofillBtn = document.getElementById('autofillBtn');
-    const fileInput = document.getElementById('resumeFile');
+    const manageBtn = document.getElementById('manageBtn');
     const statusDiv = document.getElementById('status');
 
-    // Fields to save/load
-    const fields = ['fullName', 'email', 'phone', 'linkedin', 'portfolio', 'resumeText', 'coverLetter'];
+    // Load Profiles
+    chrome.storage.local.get(['profiles', 'activeProfileId'], (result) => {
+        const profiles = result.profiles || {};
+        const activeId = result.activeProfileId;
 
-    // Load saved data
-    chrome.storage.local.get(fields, (result) => {
-        fields.forEach(field => {
-            if (result[field]) {
-                document.getElementById(field).value = result[field];
-            }
-        });
+        profileSelect.innerHTML = '';
+
+        const keys = Object.keys(profiles);
+        if (keys.length === 0) {
+            const opt = document.createElement('option');
+            opt.text = "No profiles found";
+            profileSelect.add(opt);
+            autofillBtn.disabled = true;
+        } else {
+            keys.forEach(id => {
+                const opt = document.createElement('option');
+                opt.value = id;
+                opt.text = profiles[id].name;
+                if (id === activeId) opt.selected = true;
+                profileSelect.add(opt);
+            });
+            autofillBtn.disabled = false;
+        }
     });
 
-    // Save Profile
-    saveBtn.addEventListener('click', () => {
-        const data = {};
-        fields.forEach(field => {
-            data[field] = document.getElementById(field).value;
-        });
-
-        chrome.storage.local.set(data, () => {
-            showStatus('Profile saved!', 'success');
-        });
+    // Save Active Profile on Change
+    profileSelect.addEventListener('change', () => {
+        const selectedId = profileSelect.value;
+        if (selectedId) {
+            chrome.storage.local.set({ activeProfileId: selectedId });
+        }
     });
 
-    // Autofill Action
+    // Open Options Page
+    manageBtn.addEventListener('click', () => {
+        chrome.runtime.openOptionsPage();
+    });
+
+    // Autofill
     autofillBtn.addEventListener('click', async () => {
-        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        if (tab) {
-            // Collect current data to send fresh
-            const data = {};
-            fields.forEach(field => {
-                data[field] = document.getElementById(field).value;
-            });
+        const selectedId = profileSelect.value;
+        if (!selectedId) return;
 
-            // Send message to content script
-            chrome.tabs.sendMessage(tab.id, {
-                action: 'AUTOFILL',
-                data: data
-            }).catch(err => {
-                showStatus('Reload the page first!', 'error');
-                console.error(err);
-            });
-        }
-    });
-
-    // PDF Parsing
-    fileInput.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        if (file.type !== 'application/pdf') {
-            showStatus('Please upload a PDF file.', 'error');
-            return;
-        }
-
-        showStatus('Parsing PDF...', 'info');
-
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-
-            let fullText = '';
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
-                fullText += pageText + '\n\n';
+        // Get fresh data
+        chrome.storage.local.get(['profiles'], async (result) => {
+            const profile = result.profiles ? result.profiles[selectedId] : null;
+            if (!profile) {
+                statusDiv.textContent = "Error loading profile";
+                return;
             }
 
-            document.getElementById('resumeText').value = fullText.trim();
-            showStatus('Resume text extracted!', 'success');
-        } catch (err) {
-            console.error('PDF Parse Error:', err);
-            showStatus('Failed to parse PDF.', 'error');
-        }
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            if (tab) {
+                chrome.tabs.sendMessage(tab.id, {
+                    action: 'AUTOFILL',
+                    data: profile.data
+                }).then(() => {
+                    statusDiv.textContent = "Autofill sent!";
+                    statusDiv.style.color = 'green';
+                }).catch(err => {
+                    statusDiv.textContent = "Reload page first!";
+                    statusDiv.style.color = 'red';
+                });
+            }
+        });
     });
-
-    function showStatus(msg, type) {
-        statusDiv.textContent = msg;
-        statusDiv.style.color = type === 'error' ? '#e74c3c' : '#27ae60';
-        setTimeout(() => {
-            statusDiv.textContent = '';
-        }, 3000);
-    }
 });
