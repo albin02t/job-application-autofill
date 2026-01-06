@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Job Application Test Form</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+        }
+
+        .group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+        }
+
+        input,
+        textarea {
+            width: 300px;
+            padding: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Job Application</h1>
+    <form>
+        <div class="group">
+            <label for="fname">First Name</label>
+            <input type="text" id="fname" name="firstName">
+        </div>
+        <div class="group">
+            <label for="lname">Last Name</label>
+            <input type="text" id="lname" name="lastName">
+        </div>
+        <div class="group">
+            <label for="full_name">Full Name (Alternative)</label>
+            <input type="text" id="full_name" name="fullName">
+        </div>
+        <div class="group">
+            <label for="email_addr">Email Address</label>
+            <input type="email" id="email_addr" name="email">
+        </div>
+        <div class="group">
+            <label>Mobile Full Number</label>
+            <input type="tel" name="phone">
+        </div>
+        <div class="group">
+            <label for="linkedin_url">LinkedIn Profile</label>
+            <input type="url" id="linkedin_url" placeholder="https://linkedin.com/...">
+        </div>
+        <div class="group">
+            <label for="portfolio">Portfolio URL</label>
+            <input type="text" id="portfolio">
+        </div>
+        <div class="group">
+            <label for="cover_letter">Why should we hire you?</label>
+            <textarea id="cover_letter" rows="5"></textarea>
+        </div>
+        <div class="group">
+            <label for="resume">Resume/CV</label>
+            <input type="file" id="resume">
+        </div>
+    </form>
+</body>
+
+</html>
